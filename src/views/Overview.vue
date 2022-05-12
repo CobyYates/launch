@@ -1,8 +1,7 @@
 <template>
   <div>
     <v-row>
-      <v-col cols="12" md="6" lg="4">
-        <heading title="PROJECT DETAILS" />
+      <v-col cols="12" md="6">
         <v-row>
           <v-avatar
             class="mt-3 ml-3"
@@ -12,84 +11,139 @@
             width="124"
             :class="inputStyle"
           >
-            <v-img v-if="idea.logo" :src="idea.logo" />
+            <v-img v-if="product.logo" :src="product.logo" />
             <span v-else>
               <v-icon>mdi-image</v-icon>
-              <p class="mb-0">Logo</p>
+              <p class="mb-0">Picture</p>
             </span>
           </v-avatar>
           <v-col>
             <v-text-field
-              v-model="idea.title"
+              v-model="product.title"
               :hide-details="true"
               outlined
-              label="Name"
+              dense
+              label="Product Title"
               :class="inputStyle"
-              @blur="updateIdea"
+              @blur="updateProduct"
             />
             <v-text-field
-              v-model="idea.subheader"
+              v-model="product.handle"
               :hide-details="true"
               outlined
-              label="Business Type ( eCommerce, Brick and Mortar )"
+              dense
+              label="Product Handle"
               :class="inputStyle"
-              @blur="updateIdea"
+              @blur="updateProduct"
+            />
+            <v-btn-toggle
+              class="mb-3"
+              color="primary"
+              v-model="product.width"
+              mandatory
+            >
+              <v-btn
+                :value="btn.text"
+                v-for="btn in widths"
+                :key="btn.i"
+                class="width-btn"
+              >
+                <div :class="`width-btn__${btn.class}`" />
+                <div>{{ btn.text }}</div>
+              </v-btn>
+            </v-btn-toggle>
+            <tiptap-vuetify
+              v-model="product.description"
+              class="rich"
+              :card-props="{ height: '467', width: 'auto' }"
+              :toolbar-attributes="{ color: 'gray' }"
+              :extensions="extensions"
             />
           </v-col>
         </v-row>
-        <v-textarea
-          v-model="idea.description"
-          :hide-details="true"
-          outlined
-          label="Description"
-          :class="inputStyle"
-          :auto-grow="false"
-          no-resize
-          rows="7"
-          @blur="updateIdea"
-        />
       </v-col>
-      <v-col cols="12" md="6" lg="4">
-        <possible-names />
-      </v-col>
-      <v-col cols="12" md="6" lg="4">
-        <possible-domains />
-      </v-col>
-    </v-row>
-    <v-divider class="my-6" />
-    <v-row>
       <v-col cols="12" md="6">
-        <timeline />
-      </v-col>
-      <v-col class="mb-8" cols="12" md="6">
-        <tasks />
+        <v-simple-table>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">Size</th>
+                <th class="text-left">UPC</th>
+                <th class="text-left">SKU</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in product.sizes" :key="item.name">
+                <td>{{ item.size }}</td>
+                <td>{{ item.sku }}</td>
+                <td>{{ item.upc }}</td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
       </v-col>
     </v-row>
   </div>
 </template>
 
 <script>
-import { ideasCollection } from "@/firebase/credentials";
-import PossibleNames from "../components/Idea/PossibleNames";
-import Tasks from "../components/Idea/Tasks";
-import Timeline from "../components/Idea/Timeline.vue";
-import Heading from "../components/Page/Heading.vue";
-import PossibleDomains from "../components/Idea/PossibleDomains.vue";
+import { productsCollection } from "@/firebase/credentials";
+import {
+  TiptapVuetify,
+  Heading,
+  Bold,
+  Italic,
+  Underline,
+  Code,
+  Paragraph,
+  BulletList,
+  OrderedList,
+  ListItem,
+  Link,
+  Blockquote,
+  HardBreak,
+  HorizontalRule,
+  History,
+} from "tiptap-vuetify";
 export default {
-  components: {
-    PossibleNames,
-    Tasks,
-    Timeline,
-    Heading,
-    PossibleDomains,
-  },
+  components: { TiptapVuetify },
   data() {
     return {
-      idea: {
+      product: {
         title: "",
         description: "",
         logo: "",
+        width: "",
       },
+      widths: [
+        { text: "Halo" },
+        { text: "Thin" },
+        { text: "Standard" },
+        { text: "Wide" },
+      ],
+      extensions: [
+        History,
+        Blockquote,
+        Link,
+        Underline,
+        Italic,
+        ListItem,
+        BulletList,
+        OrderedList,
+        [
+          Heading,
+          {
+            options: {
+              levels: [1, 2],
+            },
+          },
+        ],
+        Bold,
+        Code,
+        HorizontalRule,
+        Paragraph,
+        HardBreak,
+      ],
     };
   },
   computed: {
@@ -99,33 +153,27 @@ export default {
     },
   },
   methods: {
-    async updateIdea() {
+    async updateProduct() {
       try {
-        await ideasCollection.doc(this.$route.params.id).update(this.idea);
+        await productsCollection
+          .doc(this.$route.params.id)
+          .update(this.product);
       } catch (error) {
         console.log(error);
       }
     },
   },
   async mounted() {
-    if (this.$route.params) {
-      let document = await ideasCollection
-        .doc(`${this.$route.params.id}`)
-        .get();
-      // let subCollectionDocs = await ideasCollection
-      //   .doc(document.id)
-      //   .collection("tasks")
-      //   .get();
-      // obj.tasks = [];
-      // if (subCollectionDocs.docs.length > 0) {
-      //   subCollectionDocs.forEach(async (task) => {
-      //     obj.tasks.push(task.data());
-      //   });
-      // }
-      this.idea = document.data();
-    }
+    let document = await productsCollection
+      .doc(`${this.$route.params.id}`)
+      .get();
+    this.product = document.data();
   },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+::v-deep .ProseMirror {
+  height: 400px;
+}
+</style>

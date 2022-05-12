@@ -2,7 +2,8 @@ import Vue from "vue";
 import Vuex from "vuex";
 import {
   auth,
-  ideasCollection,
+  launchesCollection,
+  productsCollection,
   usersCollection,
 } from "../firebase/credentials.js";
 import * as fb from "../firebase/credentials.js";
@@ -13,17 +14,17 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     userProfile: {},
-    idea: {
+    launch: {
       title: null,
-      to: null
+      to: null,
     },
     isAuthenticated: false,
-    ideas: [],
+    launches: [],
     postIdeas: [],
     socialHandles: [],
     revenueStreams: [],
     posts: [],
-    resources: [],
+    products: [],
     userSettings: {},
     elevation: 1,
     socials: [
@@ -57,41 +58,49 @@ export default new Vuex.Store({
     setCrumb(state, val) {
       state.crumb = val;
     },
-    async setIdeas(state) {
-      let documents = await ideasCollection.where(
-        "userID",
-        "==",
-        state.userProfile.uid
-      );
-      // .orderBy("favorite", "desc");
+    async setLaunches(state) {
+      let documents = await launchesCollection;
 
-      state.ideas = [];
+      state.launches = [];
 
       documents.onSnapshot((doc) => {
         doc.docChanges().forEach(async (p) => {
           if (p.type === "added") {
             let obj = p.doc.data();
             obj.id = p.doc.id;
-
-            let subCollectionDocs = await ideasCollection
-              .doc(p.doc.id)
-              .collection("tasks")
-              .get();
-            obj.tasks = [];
-            if (subCollectionDocs.docs.length > 0) {
-              subCollectionDocs.forEach(async (task) => {
-                obj.tasks.push(task.data());
-              });
-            }
-            state.ideas.push(obj);
+            state.launches.push(obj);
           } else if (p.type === "modified") {
             let id = p.doc.id;
-            let index = state.ideas.map((obj) => obj.id).indexOf(id);
-            state.ideas[index].favorite = p.doc.data().favorite;
+            let index = state.launches.map((obj) => obj.id).indexOf(id);
+            state.launches[index].favorite = p.doc.data().favorite;
           } else if (p.type === "removed") {
             let id = p.doc.id;
-            let index = state.ideas.map((obj) => obj.id).indexOf(id);
-            state.ideas.splice(index, 1);
+            let index = state.launches.map((obj) => obj.id).indexOf(id);
+            state.launches.splice(index, 1);
+          }
+        });
+      });
+    },
+    async setProducts(state, id) {
+      let documents = await productsCollection
+        .where("launchID", "==", id)
+
+      state.products = [];
+
+      documents.onSnapshot((doc) => {
+        doc.docChanges().forEach(async (p) => {
+          if (p.type === "added") {
+            let obj = p.doc.data();
+            obj.id = p.doc.id;
+            state.products.push(obj);
+          } else if (p.type === "modified") {
+            let id = p.doc.id;
+            let index = state.products.map((obj) => obj.id).indexOf(id);
+            state.products[index].favorite = p.doc.data().favorite;
+          } else if (p.type === "removed") {
+            let id = p.doc.id;
+            let index = state.products.map((obj) => obj.id).indexOf(id);
+            state.products.splice(index, 1);
           }
         });
       });
@@ -165,8 +174,11 @@ export default new Vuex.Store({
       router.push("/").catch(() => {});
     },
 
-    loadIdeas({ commit }) {
-      commit("setIdeas");
+    loadLaunches({ commit }) {
+      commit("setLaunches");
+    },
+    loadProducts({ commit }, val) {
+      commit("setProducts", val);
     },
   },
   modules: {},

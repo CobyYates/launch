@@ -1,6 +1,5 @@
 <template>
   <div>
-    
     <v-row class="mb-10 px-3">
       <v-col>
         <v-row
@@ -20,61 +19,56 @@
           </v-col>
           <v-col cols="2" class="d-flex align-center">
             <v-btn @click="dialog = true" outlined color="primary" tile>
-              Add Another
+              Add Product
             </v-btn>
           </v-col>
           <v-spacer />
           <v-col class="justify-end d-flex align-center" cols="10" sm="3">
-            <div class="mr-2 d-flex align-center">
-              <v-chip class="mr-2" label color="primary">
-                <v-icon left size="20"> mdi-lightbulb-outline </v-icon>
-                IDEAS: {{ ideas.length }}
-              </v-chip>
-            </div>
+            <div class="mr-2 d-flex align-center"></div>
             <v-icon @click="tableSet(true)" class="mr-2">mdi-menu</v-icon>
             <v-icon @click="tableSet(false)">mdi-view-grid</v-icon>
           </v-col>
         </v-row>
-        <idea-card v-if="filteredIdeas.length > 0" :ideas="filteredIdeas" />
+        <launch-card v-if="products.length > 0" :launches="products" />
         <div v-else class="noData text-center">
           <loading />
-            <h2>You have no business ideas saved</h2>
-            <p>{{ description }}</p>
-            <v-btn
-              @click="dialog = true"
-              outlined
-              color="primary"
-              tile
-              class="mt-3"
-            >
-              Add One
-            </v-btn>
+          <h2>You have no products saved</h2>
+          <p>{{ description }}</p>
+          <v-btn
+            @click="dialog = true"
+            outlined
+            color="primary"
+            tile
+            class="mt-3"
+          >
+            Add Product
+          </v-btn>
         </div>
       </v-col>
     </v-row>
 
     <v-dialog v-model="dialog" width="500">
       <v-card>
-        <v-card-title> Social Handle </v-card-title>
+        <v-card-title> Product Information </v-card-title>
         <v-card-text>
-          <v-form @submit.prevent="addNew" ref="form"
-            ><v-text-field
-              label="Idea Title"
-              v-model="idea.title"
+          <v-form @submit.prevent="addNew" ref="form">
+            <v-text-field
+              label="Product Title"
+              v-model="product.title"
               outlined
               hide-details
             />
             <v-textarea
               class="my-3"
               label="Description"
-              v-model="idea.description"
+              v-model="product.description"
               outlined
               :auto-grow="false"
               no-resize
               rows="4"
               hide-details
             />
-            <v-btn @click="add" outlined color="primary">Add Idea</v-btn>
+            <v-btn @click="add" outlined color="primary">Add Product</v-btn>
           </v-form>
         </v-card-text>
       </v-card>
@@ -83,26 +77,26 @@
 </template>
 
 <script>
-import IdeaCard from "../components/Dashboard/IdeasGrid.vue";
-import { ideasCollection, usersCollection } from "@/firebase/credentials";
+import LaunchCard from "../components/Dashboard/LaunchesGrid.vue";
+import { productsCollection, usersCollection } from "@/firebase/credentials";
 import { mapState } from "vuex";
 import Loading from "../components/Page/Loading.vue";
 export default {
   components: {
-    IdeaCard,
-    Loading
-},
+    LaunchCard,
+    Loading,
+  },
   data() {
     return {
-      description: `Those things that are not written, can easily be forgotten!`,
       search: false,
+      description: "Add a product to get started",
       dialog: false,
       searchVal: "",
       counter: {
-        title: "IDEAS",
+        title: "launches",
         count: 3,
       },
-      idea: {
+      product: {
         title: "",
         description: "",
       },
@@ -110,14 +104,13 @@ export default {
   },
   methods: {
     async add() {
-      let result = this.idea;
-      result.userID = this.userProfile.uid;
-      result.favorite = false;
+      let result = this.product;
       try {
-        await ideasCollection.add(result);
-        this.idea = {
-          idea: "",
+        await productsCollection.add(result);
+        this.product = {
+          title: "",
           description: "",
+          launchID: this.$route.params.id
         };
       } catch (error) {
         console.log(error);
@@ -135,30 +128,14 @@ export default {
       }
       this.table = val;
     },
-    // sortIdeas() {
-    //   let result = this.ideas.sort((a, b) => {
-    //     b.favorite - a.favorite;
-    //   });
-    //   return result
-    // },
   },
   computed: {
-    ...mapState(["userProfile", "ideas", "userSettings"]),
-    filteredIdeas() {
-      let result = this.ideas;
-      if (this.searchVal != "") {
-        result = this.ideas.filter((e) =>
-          e.title.toLowerCase().includes(this.searchVal.toLowerCase())
-        );
-      }
-      return result;
-    },
+    ...mapState(["userProfile", "products", "userSettings"]),
   },
   beforeCreate() {
-    this.$store.dispatch("loadIdeas");
+    this.$store.dispatch("loadProducts", this.$route.params.id);
   },
 };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

@@ -20,15 +20,18 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
-// var ui = new firebaseui.auth.AuthUI(firebase.auth());
 
-const ideasCollection = db.collection("ideas");
+const launchesCollection = db.collection("launches");
+const launchCollection = db.collection("product");
+const productsCollection = db.collection("products");
 const usersCollection = db.collection("users");
 const dropDownsCollection = db.collection("dropdowns");
 
 export {
   db,
-  ideasCollection,
+  launchesCollection,
+  launchCollection,
+  productsCollection,
   usersCollection,
   dropDownsCollection,
   storage,

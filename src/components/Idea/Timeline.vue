@@ -11,17 +11,10 @@
           height="auto"
           class="mb-2"
         >
-          <v-card-text
-            class="comment body-1"
-            cols="9"
-           
-            v-html="comment.text"
-          />
+          <v-card-text class="comment body-1" cols="9" v-html="comment.text" />
           <v-card-actions class="d-flex justify-end">
             <p class="mb-0 body-2 mr-2">{{ comment.time }}</p>
-            <v-icon class="mx-2" @click="edit(comment)">
-              mdi-pencil
-            </v-icon>
+            <v-icon class="mx-2" @click="edit(comment)"> mdi-pencil </v-icon>
             <v-icon
               @click="
                 removeSelected = comment;
@@ -235,7 +228,7 @@ export default {
     right: 5px;
   }
 }
-  ::v-deep .ProseMirror {
-    height: 400px;
-  }
+::v-deep .ProseMirror {
+  height: 400px;
+}
 </style>
