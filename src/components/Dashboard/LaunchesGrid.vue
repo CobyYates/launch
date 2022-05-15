@@ -9,7 +9,13 @@
       :key="card.i"
     >
       <v-card height="150" :elevation="$store.state.elevation">
-        <v-badge overlap class="badge" color="pink" :content="test" />
+        <v-badge
+          v-if="notifications(card.id) > 0"
+          overlap
+          class="badge"
+          color="pink"
+          :content="notifications(card.id)"
+        />
         <v-card-text
           class="d-flex align-center justify-space-between px-2 py-0"
         >
@@ -119,6 +125,19 @@ export default {
     },
   },
   methods: {
+    notifications(id) {
+      let notis = this.$store.state.notifications;
+      let result = null;
+      if (notis.length > 0) {
+        if(!this.launch) {
+          result = notis.filter((e) => e.productID == id).length;
+        }
+        else {
+          result = notis.filter((e) => e.launchID == id).length;
+        }
+      }
+      return result;
+    },
     open(id) {
       if (this.launch) {
         this.$router.push(`/launch/${id}`);

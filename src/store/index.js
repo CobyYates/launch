@@ -4,6 +4,7 @@ import {
   auth,
   launchesCollection,
   productsCollection,
+  notificationsCollection,
   usersCollection,
 } from "../firebase/credentials.js";
 import * as fb from "../firebase/credentials.js";
@@ -23,6 +24,7 @@ export default new Vuex.Store({
     postIdeas: [],
     socialHandles: [],
     revenueStreams: [],
+    notifications: [],
     posts: [],
     products: [],
     userSettings: {},
@@ -72,7 +74,7 @@ export default new Vuex.Store({
           } else if (p.type === "modified") {
             let id = p.doc.id;
             let index = state.launches.map((obj) => obj.id).indexOf(id);
-            state.launches[index].favorite = p.doc.data().favorite;
+            state.launches[index] = p.doc.data();
           } else if (p.type === "removed") {
             let id = p.doc.id;
             let index = state.launches.map((obj) => obj.id).indexOf(id);
@@ -81,9 +83,40 @@ export default new Vuex.Store({
         });
       });
     },
+    async setNotifications(state, id) {
+      let notifications;
+      if (id) {
+        notifications = await notificationsCollection.where(
+          "productID",
+          "==",
+          id
+        );
+      } else {
+        notifications = await notificationsCollection;
+      }
+
+      state.notifications = [];
+
+      notifications.onSnapshot((doc) => {
+        doc.docChanges().forEach(async (p) => {
+          if (p.type === "added") {
+            let obj = p.doc.data();
+            obj.id = p.doc.id;
+            state.notifications.push(obj);
+          } else if (p.type === "modified") {
+            let id = p.doc.id;
+            let index = state.notifications.map((obj) => obj.id).indexOf(id);
+            state.notifications[index] = p.doc.data();
+          } else if (p.type === "removed") {
+            let id = p.doc.id;
+            let index = state.notifications.map((obj) => obj.id).indexOf(id);
+            state.notifications.splice(index, 1);
+          }
+        });
+      });
+    },
     async setProducts(state, id) {
-      let documents = await productsCollection
-        .where("launchID", "==", id)
+      let documents = await productsCollection.where("launchID", "==", id);
 
       state.products = [];
 
@@ -179,6 +212,9 @@ export default new Vuex.Store({
     },
     loadProducts({ commit }, val) {
       commit("setProducts", val);
+    },
+    loadNotifications({ commit }, val) {
+      commit("setNotifications", val);
     },
   },
   modules: {},

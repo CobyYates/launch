@@ -24,6 +24,7 @@ const provider = new firebase.auth.GoogleAuthProvider();
 const launchesCollection = db.collection("launches");
 const launchCollection = db.collection("product");
 const productsCollection = db.collection("products");
+const notificationsCollection = db.collection("notifications");
 const usersCollection = db.collection("users");
 const dropDownsCollection = db.collection("dropdowns");
 
@@ -32,6 +33,7 @@ export {
   launchesCollection,
   launchCollection,
   productsCollection,
+  notificationsCollection,
   usersCollection,
   dropDownsCollection,
   storage,

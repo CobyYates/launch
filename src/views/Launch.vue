@@ -134,6 +134,7 @@ export default {
   },
   beforeCreate() {
     this.$store.dispatch("loadProducts", this.$route.params.id);
+    this.$store.dispatch("loadNotifications");
   },
 };
 </script>

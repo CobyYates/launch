@@ -1,9 +1,9 @@
 <template>
   <div>
-    <v-row>
+    <v-row v-if="admin">
       <v-col cols="12" md="6">
         <v-row>
-          <v-avatar
+          <!-- <v-avatar
             class="mt-3 ml-3"
             :color="$vuetify.theme.dark ? 'grey darken-4' : 'grey lighten-3'"
             tile
@@ -16,26 +16,63 @@
               <v-icon>mdi-image</v-icon>
               <p class="mb-0">Picture</p>
             </span>
-          </v-avatar>
+          </v-avatar> -->
           <v-col>
             <v-text-field
               v-model="product.title"
+              @blur="updateProduct"
               :hide-details="true"
+              label="Display Name"
+              :class="inputStyle"
               outlined
               dense
-              label="Product Title"
-              :class="inputStyle"
-              @blur="updateProduct"
             />
             <v-text-field
               v-model="product.handle"
+              @blur="updateProduct"
               :hide-details="true"
-              outlined
-              dense
               label="Product Handle"
               :class="inputStyle"
-              @blur="updateProduct"
+              outlined
+              dense
             />
+            <v-text-field
+              v-model="product.price"
+              @blur="updateProduct"
+              :hide-details="true"
+              :class="inputStyle"
+              label="Price"
+              prefix="$"
+              outlined
+              dense
+            />
+            <v-menu
+              :close-on-content-click="false"
+              transition="scale-transition"
+              v-model="dateMenu"
+              :nudge-right="40"
+              min-width="auto"
+              offset-y
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="product.launchDate"
+                  prepend-icon="mdi-calendar"
+                  :class="inputStyle"
+                  label="Launch Date"
+                  v-bind="attrs"
+                  hide-details
+                  v-on="on"
+                  readonly
+                  outlined
+                  dense
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="product.launchDate"
+                @input="dateMenu = false"
+              ></v-date-picker>
+            </v-menu>
             <v-btn-toggle
               class="mb-3"
               color="primary"
@@ -52,13 +89,16 @@
                 <div>{{ btn.text }}</div>
               </v-btn>
             </v-btn-toggle>
-            <tiptap-vuetify
-              v-model="product.description"
-              class="rich"
-              :card-props="{ height: '467', width: 'auto' }"
-              :toolbar-attributes="{ color: 'gray' }"
-              :extensions="extensions"
-            />
+            <div>
+              <label>Product Description</label>
+              <tiptap-vuetify
+                v-model="product.description"
+                class="rich"
+                :card-props="{ height: '300', width: 'auto' }"
+                :toolbar-attributes="{ color: 'gray' }"
+                :extensions="extensions"
+              />
+            </div>
           </v-col>
         </v-row>
       </v-col>
@@ -83,6 +123,7 @@
         </v-simple-table>
       </v-col>
     </v-row>
+    <developer-product v-else :product="product" />
   </div>
 </template>
 
@@ -105,15 +146,23 @@ import {
   HorizontalRule,
   History,
 } from "tiptap-vuetify";
+import DeveloperProduct from "../components/Product/DeveloperProduct.vue";
 export default {
-  components: { TiptapVuetify },
+  components: { TiptapVuetify, DeveloperProduct },
   data() {
     return {
+      admin: false,
+      dateMenu: false,
       product: {
         title: "",
         description: "",
         logo: "",
         width: "",
+        launchDate: new Date(
+          Date.now() - new Date().getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .substr(0, 10),
       },
       widths: [
         { text: "Halo" },
@@ -169,11 +218,14 @@ export default {
       .get();
     this.product = document.data();
   },
+  beforeCreate() {
+    this.$store.dispatch("loadNotifications",this.$route.params.id);
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 ::v-deep .ProseMirror {
-  height: 400px;
+  height: 200px;
 }
 </style>

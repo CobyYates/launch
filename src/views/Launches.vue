@@ -114,7 +114,6 @@ export default {
   methods: {
     async add() {
       let result = this.launch;
-      result.userID = this.userProfile.uid;
       result.favorite = false;
       try {
         await launchesCollection.add(result);
@@ -153,6 +152,7 @@ export default {
   },
   beforeCreate() {
     this.$store.dispatch("loadLaunches");
+    this.$store.dispatch("loadNotifications");
   },
 };
 </script>
