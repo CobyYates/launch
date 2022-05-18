@@ -121,6 +121,7 @@ export default {
           launch: "",
           description: "",
         };
+        this.dialog = false
       } catch (error) {
         console.log(error);
       }

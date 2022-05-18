@@ -188,7 +188,7 @@ export default new Vuex.Store({
 
       dispatch("fetchUserProfile", { user });
 
-      router.push("/dashboard");
+      // router.push("/dashboard");
     },
     async fetchUserProfile({ commit }, { user }) {
       const userProfile = await usersCollection
@@ -198,7 +198,7 @@ export default new Vuex.Store({
         commit("setUserProfile", e.data());
       });
 
-      router.push("/dashboard");
+      router.push("/launches");
     },
 
     async logout({ commit }) {

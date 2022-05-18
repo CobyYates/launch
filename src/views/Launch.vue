@@ -112,6 +112,7 @@ export default {
           description: "",
           launchID: this.$route.params.id
         };
+        this.dialog = true
       } catch (error) {
         console.log(error);
       }

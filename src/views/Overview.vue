@@ -1,6 +1,7 @@
 <template>
   <div>
-    <v-row v-if="admin">
+    <v-switch v-model="admin" />
+    <v-row v-if="$store.state.userProfile.role == 'admin' && admin">
       <v-col cols="12" md="6">
         <v-row>
           <!-- <v-avatar
@@ -18,7 +19,14 @@
             </span>
           </v-avatar> -->
           <v-col>
-            <v-text-field
+            <v-form ref="form">
+              <!-- <text-field
+                name="title"
+                :value="product.title"
+                label="Display Name"
+                @blur="test"
+              /> -->
+              <v-text-field
               v-model="product.title"
               @blur="updateProduct"
               :hide-details="true"
@@ -27,78 +35,90 @@
               outlined
               dense
             />
-            <v-text-field
-              v-model="product.handle"
-              @blur="updateProduct"
-              :hide-details="true"
-              label="Product Handle"
-              :class="inputStyle"
-              outlined
-              dense
-            />
-            <v-text-field
-              v-model="product.price"
-              @blur="updateProduct"
-              :hide-details="true"
-              :class="inputStyle"
-              label="Price"
-              prefix="$"
-              outlined
-              dense
-            />
-            <v-menu
-              :close-on-content-click="false"
-              transition="scale-transition"
-              v-model="dateMenu"
-              :nudge-right="40"
-              min-width="auto"
-              offset-y
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="product.launchDate"
-                  prepend-icon="mdi-calendar"
-                  :class="inputStyle"
-                  label="Launch Date"
-                  v-bind="attrs"
-                  hide-details
-                  v-on="on"
-                  readonly
-                  outlined
-                  dense
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="product.launchDate"
-                @input="dateMenu = false"
-              ></v-date-picker>
-            </v-menu>
-            <v-btn-toggle
-              class="mb-3"
-              color="primary"
-              v-model="product.width"
-              mandatory
-            >
-              <v-btn
-                :value="btn.text"
-                v-for="btn in widths"
-                :key="btn.i"
-                class="width-btn"
-              >
-                <div :class="`width-btn__${btn.class}`" />
-                <div>{{ btn.text }}</div>
-              </v-btn>
-            </v-btn-toggle>
-            <div>
-              <label>Product Description</label>
-              <tiptap-vuetify
-                v-model="product.description"
-                class="rich"
-                :card-props="{ height: '300', width: 'auto' }"
-                :toolbar-attributes="{ color: 'gray' }"
-                :extensions="extensions"
+              <v-text-field
+                v-model="product.handle"
+                @blur="updateProduct"
+                :hide-details="true"
+                label="Product Handle"
+                :class="inputStyle"
+                outlined
+                dense
+                append-outer-icon="mdi-update"
               />
-            </div>
+              <v-text-field
+                v-model="product.price"
+                @blur="updateProduct"
+                :hide-details="true"
+                :class="inputStyle"
+                label="Price"
+                prefix="$"
+                outlined
+                dense
+              />
+              <v-text-field
+                v-model="product.color"
+                @blur="updateProduct"
+                :hide-details="true"
+                :class="inputStyle"
+                label="Color"
+                outlined
+                dense
+              />
+              <v-menu
+                :close-on-content-click="false"
+                transition="scale-transition"
+                v-model="dateMenu"
+                :nudge-right="40"
+                min-width="auto"
+                offset-y
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="product.launchDate"
+                    prepend-icon="mdi-calendar"
+                    :class="inputStyle"
+                    label="Launch Date"
+                    v-bind="attrs"
+                    hide-details
+                    v-on="on"
+                    readonly
+                    outlined
+                    dense
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  v-model="product.launchDate"
+                  @input="dateMenu = false"
+                ></v-date-picker>
+              </v-menu>
+              <v-btn-toggle
+                class="mb-3"
+                color="primary"
+                v-model="product.width"
+                mandatory
+              >
+                <v-btn
+                  :value="btn.text"
+                  v-for="btn in widths"
+                  :key="btn.i"
+                  class="width-btn"
+                >
+                  <div :class="`width-btn__${btn.class}`" />
+                  <div>{{ btn.text }}</div>
+                </v-btn>
+              </v-btn-toggle>
+              <div>
+                <label>Product Description</label>
+                <tiptap-vuetify
+                  v-model="product.description"
+                  @blur="updateProduct"
+                  class="rich"
+                  :card-props="{ height: '300', width: 'auto' }"
+                  :toolbar-attributes="{ color: 'gray' }"
+                  :extensions="extensions"
+                />
+              </div>
+            </v-form>
           </v-col>
         </v-row>
       </v-col>
@@ -147,11 +167,12 @@ import {
   History,
 } from "tiptap-vuetify";
 import DeveloperProduct from "../components/Product/DeveloperProduct.vue";
+// import TextField from "../components/Page/TextField.vue";
 export default {
-  components: { TiptapVuetify, DeveloperProduct },
+  components: { TiptapVuetify, DeveloperProduct, /*TextField*/ },
   data() {
     return {
-      admin: false,
+      admin: true,
       dateMenu: false,
       product: {
         title: "",
@@ -211,6 +232,11 @@ export default {
         console.log(error);
       }
     },
+    test(val) {
+      let value = document.querySelector('form')
+      console.log(value)
+      console.log("here", val, this.$refs.form.validate());
+    },
   },
   async mounted() {
     let document = await productsCollection
@@ -219,7 +245,7 @@ export default {
     this.product = document.data();
   },
   beforeCreate() {
-    this.$store.dispatch("loadNotifications",this.$route.params.id);
+    this.$store.dispatch("loadNotifications", this.$route.params.id);
   },
 };
 </script>

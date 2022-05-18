@@ -27,8 +27,8 @@
         dark
       >
         <v-tabs-slider color="white" />
-        <v-tab to="/dashboard" v-if="isAuthenticated" class="title">
-          DASHBOARD
+        <v-tab to="/launches" v-if="isAuthenticated" class="title">
+          LAUNCHES
         </v-tab>
         <v-tab
           to="/logout"
