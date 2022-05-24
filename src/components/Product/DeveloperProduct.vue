@@ -3,8 +3,8 @@
     <div id="tap-circle" />
     <v-row>
       <v-col cols="12" md="6">
-        <product-value :value="product.title" label="Product Title" />
-        <product-value :value="product.handle" label="Product Handle" />
+        <product-value :value="product.marketing_name" label="Product Title" />
+        <product-value :value="product._id" label="Product Handle" />
         <product-value :value="product.price" label="Product Price" />
         <product-value
           :value="product.launchDate"
@@ -15,8 +15,8 @@
           label="Product Description"
         />
         <product-value :value="product.width" label="Product Width" />
-        <product-value :value="product.color" label="Product Color" />
       </v-col>
+      <v-divider v-if="$vuetify.breakpoint.mdAndUp" vertical />
       <v-col cols="12" md="6">
         <v-simple-table>
           <template v-slot:default>
@@ -44,6 +44,9 @@
             </tbody>
           </template>
         </v-simple-table>
+        <p class="title mt-3 mb-0">Accentuate Custom Fields</p>
+        <product-value :value="product.color[0]" label="Product Color" />
+        <product-value :value="product.guided_quiz.join('|')" label="Product Color" />
       </v-col>
     </v-row>
     <v-snackbar v-model="snackbar">
@@ -71,7 +74,7 @@ export default {
   data() {
     return {
       snackText: null,
-      snackbar: false
+      snackbar: false,
     };
   },
   methods: {

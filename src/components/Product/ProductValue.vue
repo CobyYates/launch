@@ -3,7 +3,9 @@
     <v-row class="">
       <v-col cols="12" class="d-flex align-center pb-0">
         <label class="primary--text">{{ label }}</label>
-        <v-icon v-if="checkFlag()" color="red" class="ml-1" small>mdi-flag</v-icon>
+        <v-icon v-if="checkFlag()" color="red" class="ml-1" small
+          >mdi-flag</v-icon
+        >
       </v-col>
     </v-row>
     <v-row>
@@ -15,7 +17,7 @@
         <v-icon size="20" @click="copyValue">mdi-content-copy</v-icon>
       </v-col>
     </v-row>
-    
+
     <v-snackbar v-model="snackbar">
       {{ snackText }}
 
@@ -32,7 +34,7 @@
 export default {
   props: {
     value: {
-      type: [String, Number],
+      type: [String, Number, Array, Object],
       default: null,
     },
     label: {
@@ -43,23 +45,25 @@ export default {
   data() {
     return {
       snackText: null,
-      snackbar: false
+      snackbar: false,
     };
   },
   methods: {
-    checkFlag(){
-      let result = false
-      if(this.$store.state.notifications.length > 0) {
-        let length = this.$store.state.notifications.filter(e => e.field == this.label).length
-        result = length > 0 ? true : false
+    checkFlag() {
+      let result = false;
+      if (this.$store.state.notifications.length > 0) {
+        let length = this.$store.state.notifications.filter(
+          (e) => e.field == this.label
+        ).length;
+        result = length > 0 ? true : false;
       }
-      return result
+      return result;
     },
     copyValue() {
       this.snackText = "Value copied to clipboard";
       this.snackbar = true;
-      navigator.clipboard.writeText(this.value)
-    }
+      navigator.clipboard.writeText(this.value);
+    },
   },
 };
 </script>

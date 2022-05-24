@@ -19,6 +19,7 @@ export default new Vuex.Store({
       title: null,
       to: null,
     },
+    current: 0,
     isAuthenticated: false,
     launches: [],
     postIdeas: [],
@@ -99,6 +100,7 @@ export default new Vuex.Store({
 
       notifications.onSnapshot((doc) => {
         doc.docChanges().forEach(async (p) => {
+          state.current++;
           if (p.type === "added") {
             let obj = p.doc.data();
             obj.id = p.doc.id;
